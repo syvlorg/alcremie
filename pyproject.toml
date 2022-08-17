@@ -1,0 +1,34 @@
+[tool.poetry]
+name = "alcremie"
+version = "2.0.0.0"
+description = "Macros for the bakery!"
+authors = ["sylvorg <jeet.ray@syvl.org>"]
+license = "OREO"
+include = [
+	"alcremie/**/*.py",
+	"alcremie/**/*.hy",
+]
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.11"
+bakery = { git = "https://github.com/syvlorg/bakery.git", branch = "main" }
+
+[tool.poetry.dev-dependencies]
+pytest = "^3.0"
+poetry = "*"
+poetry2setup = "*"
+pytest-hylang = "*"
+pytest-randomly = "*"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+addopts = [
+	"--strict-markers",
+]
+markers = [
+	"piping",
+	"baking",
+]

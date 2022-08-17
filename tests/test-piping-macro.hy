@@ -1,0 +1,36 @@
+(require alcremie [p])
+(import bakery)
+(import pytest [mark])
+(import hy hy [mangle])
+(setv egrep (p (env :m/exports { "FOO" "bar" }) (grep "FOO")))
+(defn [mark.piping] test-piping-macro [] (assert (= (egrep :m/str True) "FOO=bar")))
+(defn [mark.piping mark.baking] test-bake-freezer-no-args-non-attr-kwargs []
+      (try (.bake- egrep :m/str True)
+           (assert (= (egrep) "FOO=bar"))
+           (finally (.splat- egrep)
+                    (assert (not (in (mangle "m/str") (get egrep.m/kwargs.baked egrep.m/subcommand.default)))))))
+(defn [mark.piping mark.baking (.parametrize mark "opts, cls" #(
+      #({ "base_programs_" True } "base_program")
+      #({ "base_program_" "env" } "base_program")
+      #({ "programs_" True } "program")
+      #({ "program_" "env" } "program")
+      #({ "freezers_" True } "freezer")
+      #({ "freezer_hash_" egrep.m/freezer-hash } "freezer")
+      #({ "freezer_hash_" (hash (tuple egrep.m/freezer)) } "freezer")
+))] test-piping-macro-baking [opts cls]
+    (try (.bake- egrep :m/str True #** opts)
+         (assert (= (egrep) "FOO=bar"))
+         (finally (.splat- egrep #** opts)
+                  (let [ k (next (iter (.keys opts)))
+                         v (next (iter (.values opts))) ]
+                       (assert (not (in (mangle "m/str") (get (get egrep.m/kwargs cls) (cond (= k "freezers_") egrep.m/freezer-hash
+                                                                                             (isinstance v bool) (getattr egrep (mangle (+ "m/" cls)))
+                                                                                             True v)))))))))
+(defn [mark.baking (.parametrize mark "opts, cls" #(
+      #({ "base_program_" "grep" } "base_program")
+      #({ "program_" "grep" } "program")
+))] test-piping-macro-not-baking [opts cls]
+    (try (.bake- egrep :m/str True #** opts)
+         (assert (not (isinstance (egrep) str)))
+         (finally (.splat- egrep #** opts)
+                  (assert (not (in (mangle "m/sort") (get (get egrep.m/kwargs cls) (next (iter (.values opts))))))))))
