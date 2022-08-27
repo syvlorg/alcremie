@@ -36,26 +36,16 @@ in {
     outputs = inputs@{ self, flake-utils, settings, ... }: with builtins; with settings.lib; with flake-utils.lib; settings.mkOutputs {
         inherit inputs;
         pname = "alcremie";
-        callPackage = { buildPythonPackage, pythonOlder, poetry-core, bakery, pytest-hy, pytest-randomly, pytestCheckHook, pname }: let
+        callPackage = { stdenv, bakery, pname }: j.mkPythonPackage self.pkgs.${stdenv.targetPlatform.system}.Pythons.${self.type}.pkgs (rec {
             owner = "syvlorg";
-        in buildPythonPackage rec {
             inherit pname;
-            version = j.pyVersion format src;
-            format = "pyproject";
-            disabled = pythonOlder "3.9";
             src = ./.;
-            buildInputs = [ poetry-core ];
-            nativeBuildInputs = buildInputs;
-            propagatedBuildInputs = [ (bakery.overridePythonAttrs (old: { doCheck = false; })) ];
-            pythonImportsCheck = [ pname ];
-            checkInputs = [ pytestCheckHook pytest-hy pytest-randomly ];
-            checkPhase = "pytest";
+            propagatedBuildInputs = [ bakery ];
             postPatch = ''
                 substituteInPlace pyproject.toml --replace "bakery = { git = \"https://github.com/${owner}/bakery.git\", branch = \"main\" }" ""
                 substituteInPlace setup.py --replace "'bakery @ git+https://github.com/${owner}/bakery.git@main'" ""
             '';
-            meta.homepage = "https://github.com/${owner}/${pname}";
-        };
+        });
         type = "hy";
     };
 }
