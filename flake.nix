@@ -2,6 +2,7 @@
     description = "Macros for the bakery!";
     inputs = rec {
         settings.url = github:sylvorg/settings;
+        titan.url = github:syvlorg/titan;
         flake-utils.url = github:numtide/flake-utils;
         flake-compat = {
             url = "github:edolstra/flake-compat";
