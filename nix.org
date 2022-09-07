@@ -65,7 +65,7 @@ in {
             propagatedBuildInputs = [ bakery ];
             postPatch = ''
                 substituteInPlace pyproject.toml --replace "bakery = { git = \"https://github.com/${owner}/bakery.git\", branch = \"main\" }" ""
-                substituteInPlace setup.py --replace "'bakery @ git+https://github.com/${owner}/bakery.git@main'" ""
+                substituteInPlace setup.py --replace "'bakery @ git+https://github.com/${owner}/bakery.git@main'" "" || :
             '';
         });
         type = "hy";
